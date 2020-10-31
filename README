@@ -1,0 +1,94 @@
+# 2016~ by Cho-Yu Yang
+
+# Program execution platform : Linux environment, LAB718 (IP 192.168.144.117)
+
+# Program language : C++ (C++11 or above)
+
+# folder & files description
+
+  bin => executable binary files
+  input => PG solver input files
+  LPresult => verification result files (voltage drop map & program elapse time information)
+  main => main.cpp
+  Method2_Results => Method2 (not in thesis)
+  obj => *.o 
+  PGGen_input => pg generator input files
+  PGGen_result => pg generator result files
+  PointMap => Current map and temperature map results of one node
+  result => DC simulation result files
+  src => source codes
+
+# Program specification :
+
+(1) 
+	PG Solver Verification requires 3 files in 'input' folder
+	
+	*.sp , ckt.txt , constraint.txt
+	
+(2) Input file format
+	
+	1. *.sp file description
+	
+		PG Generator circuit format (spice format)
+
+    2. ckt.txt description
+
+	CKT_NAME PG1.sp
+	XGrid_dimention 10			// x direction cuts (thermal grid cuts)
+	YGrid_dimention 10			// y direction cuts
+	ZGrid_dimention_Metal 1		// metal layer cuts
+	ZGrid_dimention_Sub 1		// substrate layer cuts
+	Z_len 6e-6 54e-9 700e-6		// set z length(m) of each layer 
+	
+	// Note : unit of length is (m)
+	
+	3. constraint.txt description
+	
+		block 2(x direction) 2(y direction) 		  //  PG partition into 2 * 2 blocks
+	
+		scalefactor 0.5  							  //  globalconstraint = (peak local current sum) * scalefactor
+
+	
+(3) Execution guide  
+	
+	1. Set environment variable
+	
+	PATH=$PATH:/usr/local/Matlab/R2017a/bin
+	
+	LD_LIBRARY_PATH=/usr/local/Matlab/R2017a/sys/os/glnxa64:/usr/local/Matlab/R2017a/bin/glnxa64:/home/edausers/jacob24788/mosek/bin
+	
+	export PATH
+	
+	export LD_LIBRARY_PATH
+	
+	2.
+	
+	make
+	
+	./run [PGsolver mode1 (0 or 1)] [PGsolver mode2 (0 or 1)] [PG generator mode (0 or 1)] [verification mode(1~15)]
+	
+	example : 
+	
+	1. ./run 1 0 0 3   // Activate pg solver, closes pg generator, verification mode 3 is executed.
+	
+	(look main.cpp for more information)
+	
+(4) Verification modes 
+	
+		case 1 : 	// Direct QP  (Don't run this, use Efficient QP !) 	
+		case 2 : 	// Efficient QP without IR drop recalculation (in thesis)
+		case 3 : 	// Direct Expansion Point Method without IR drop recalculation (not in thesis) 
+		case 4 : 	// Expansion Point Method without IR drop recalculation (in thesis)
+		case 5 : 	// Thermal-less LP 
+		case 6 : 	// Efficient Thermal-less LP 
+		case 7 : 	// Efficient Expand Point (Method2) Direct (not in thesis)
+		case 8 : 	// Efficient Expand Point (Method2) Iterative (not in thesis)
+		case 9 :	// Efficient QP with IR drop recalculation (Combined with Efficient QP without IR drop recalculation) (in thesis)
+		case 10 :	// Direct Expansion Point Method with IR drop recalculation (in thesis)
+		case 11 : 	// Expansion Point Method with IR drop recalculation (in thesis)
+		case 12 :	// 做兩次QP, 第二次QP會在第一次QP找到的solution current pattern所造成的溫度之下展開 (not in thesis)
+		case 13 :   // Same approach as case 12 but using iterative method (not in thesis)
+		case 14 : 	// Expansion Point Method with IR drop recalculation using Matlab (Iterative)
+		case 15 : 	// Expansion Point Method without IR drop recalculation using Matlab 
+			
+last update : 2018.8.21
